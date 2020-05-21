@@ -1,34 +1,53 @@
 <template>
     <v-form ref="myScoresForm">
-                <v-radio-group v-model="zhuang" row label="庄家:">
-                    <v-radio v-for="(player,index) in players"
-                             :key="player.id"
-                             :label="player.name"
-                             :value="index"
-                    ></v-radio>
-                </v-radio-group>
-                <v-radio-group v-model="isNoneHuPai" row label="流局?">
-                    <v-radio key="true" value="true" label="是"/>
-                    <v-radio key="false" value="false" label="否"/>
-                </v-radio-group>
-                <v-radio-group v-model="huPaiNo" row label="胡牌:" :disabled="isNoneHuPai=='true'">
-                    <v-radio v-for="(player,index) in players"
-                             :key="player.id"
-                             :label="player.name"
-                             :value="index"
-                    ></v-radio>
-                </v-radio-group>
-                <v-text-field label="胡牌分数" type="number"
-                              single-line
-                              v-model="score"
-                              :disabled="isNoneHuPai=='true'"
-                              clearable
-                              @keydown="handleInput"
-                ></v-text-field>
-        <v-layout class="my-4" row>
+        <v-select
+                v-model="zhuang"
+                :items="players"
+                item-text="name"
+                item-value="id"
+                label="庄家:"
+
+        >
+        </v-select>
+<!--        <v-radio-group v-model="zhuang" row label="庄家:" dense>-->
+<!--            <v-radio v-for="(player,index) in players"-->
+<!--                     :key="player.id"-->
+<!--                     :label="player.name"-->
+<!--                     :value="index"-->
+<!--            ></v-radio>-->
+<!--        </v-radio-group>-->
+        <v-radio-group v-model="isNoneHuPai" row label="流局?">
+            <v-radio key="true" value="true" label="是"/>
+            <v-radio key="false" value="false" label="否"/>
+        </v-radio-group>
+        <v-select
+                v-model="huPaiNo"
+                :items="players"
+                item-text="name"
+                item-value="id"
+                label="胡牌:"
+                :disabled="isNoneHuPai=='true'"
+        >
+        </v-select>
+<!--        <v-radio-group v-model="huPaiNo" row label="胡牌:" :disabled="isNoneHuPai=='true'">-->
+<!--            <v-radio v-for="(player,index) in players"-->
+<!--                     :key="player.id"-->
+<!--                     :label="player.name"-->
+<!--                     :value="index"-->
+<!--            ></v-radio>-->
+<!--        </v-radio-group>-->
+        <v-text-field label="胡牌分数"
+                      type="number" inputmode="numeric" pattern="[0-9]*"
+                      single-line
+                      v-model="score"
+                      :disabled="isNoneHuPai=='true'"
+                      clearable
+                      @keydown="handleInput"
+        ></v-text-field>
+
+        <v-layout row>
             <v-spacer/>
             <v-btn @click="submit" color="primary">提交</v-btn>
-            <!--            <v-btn @click="clear">重置</v-btn>-->
         </v-layout>
     </v-form>
 </template>
@@ -74,7 +93,7 @@
                 // 重置表单
                 this.$refs.myScoresForm.reset();
             },
-            handleInput(e){
+            handleInput(e) {
                 let a = e.key.replace(/[^\d]/g, "");
                 if (!a) {
                     e.preventDefault();

@@ -2,20 +2,34 @@
     <v-app>
         <v-app-bar app>
             <v-app-bar-nav-icon @click="openSetup"></v-app-bar-nav-icon>
-            <v-toolbar-title>字牌计数</v-toolbar-title>
+            <v-toolbar-title>字牌记分</v-toolbar-title>
             <v-spacer></v-spacer>
             <v-btn icon @click="openRecord">
                 <v-icon>fas fa-edit</v-icon>
             </v-btn>
-            <v-btn icon @click="openRemove">
-                <v-icon>fas fa-times</v-icon>
-            </v-btn>
+
             <v-btn icon @click="openJiezhang">
                 <v-icon>fas fa-check</v-icon>
             </v-btn>
-            <v-btn icon @click="log2history">
-                <v-icon>fas fa-times</v-icon>
-            </v-btn>
+            <v-menu
+                    left
+                    bottom
+            >
+                <template v-slot:activator="{ on }">
+                    <v-btn icon v-on="on">
+                        <v-icon>mdi-dots-vertical</v-icon>
+                    </v-btn>
+                </template>
+
+                <v-list>
+                    <v-list-item @click="openRemove">
+                        <v-list-item-title>删除</v-list-item-title>
+                    </v-list-item>
+                    <v-list-item @click="log2history">
+                        <v-list-item-title>清空</v-list-item-title>
+                    </v-list-item>
+                </v-list>
+            </v-menu>
         </v-app-bar>
 
         <!-- Sizes your content based upon application components -->
@@ -27,28 +41,19 @@
                     <tr>
                         <th class="text-center">庄家</th>
                         <th v-for="(player) in players" :key="player.id" class="text-center">{{player.name}}</th>
-<!--                        <th class="text-center">{{players.no1}}</th>-->
-<!--                        <th class="text-center">{{players.no2}}</th>-->
-<!--                        <th class="text-center">{{players.no3}}</th>-->
-<!--                        <th class="text-center">{{players.no4}}</th>-->
                     </tr>
                     </thead>
                     <tbody>
                     <tr v-for="score in scores" :key="score.id">
                         <td class="text-center">{{ getZhuangName(score.zhuang) }}</td>
-                        <td class="text-center">{{score.score[0]==0?'-':score.score[0]}}</td>
-                        <td class="text-center">{{score.score[1]==0?'-':score.score[1]}}</td>
-                        <td class="text-center">{{score.score[2]==0?'-':score.score[2]}}</td>
-                        <td class="text-center">{{score.score[3]==0?'-':score.score[3]}}</td>
+                        <td class="text-center" v-for="(fen,idx) in score.score" :key="idx">{{fen==0?'-':fen}}</td>
                     </tr>
                     </tbody>
                     <tfoot>
                     <tr>
                         <td class="text-center">合:{{scores.length}}</td>
-                        <td class="text-center">{{totalScores[0].score==0?'-':totalScores[0].score}}</td>
-                        <td class="text-center">{{totalScores[1].score==0?'-':totalScores[1].score}}</td>
-                        <td class="text-center">{{totalScores[2].score==0?'-':totalScores[2].score}}</td>
-                        <td class="text-center">{{totalScores[3].score==0?'-':totalScores[3].score}}</td>
+                        <td class="text-center" v-for="scoreObj in totalScores" :key="scoreObj.id"
+                            v-text="scoreObj.score"></td>
                     </tr>
                     </tfoot>
                 </v-simple-table>
@@ -85,7 +90,8 @@
                 </v-toolbar>
                 <!--对话框的内容，表单-->
                 <v-card-text class="px-5" style="height:400px">
-                    <InputScoresForm ref="update-score-form" @updateScores="updateScores" :scoreId="scoreId" :zhuang-prop="zhuang" :players="players"/>
+                    <InputScoresForm ref="update-score-form" @updateScores="updateScores" :scoreId="scoreId"
+                                     :zhuang-prop="zhuang" :players="players"/>
                 </v-card-text>
             </v-card>
         </v-dialog>
@@ -102,7 +108,7 @@
                 </v-toolbar>
                 <!--对话框的内容，表单-->
                 <v-card-text class="px-5">
-                    删除最后一次记分?
+                    <v-label>删除最后一次记分?</v-label>
                 </v-card-text>
                 <v-card-actions>
                     <v-spacer></v-spacer>
@@ -170,12 +176,12 @@
             showJiezhangDialog: false,
             zhuang: 0,   //当前庄家
             totalScores: [
-                {id:1,score:0}, // 玩家1
-                {id:2,score:0}, // 玩家2
-                {id:3,score:0}, // 玩家3
-                {id:4,score:0}, // 玩家4
+                {id: 0, score: 0}, // 玩家1
+                {id: 1, score: 0}, // 玩家2
+                {id: 2, score: 0}, // 玩家3
+                {id: 3, score: 0}, // 玩家4
             ],
-            players: [ {id:1,name:'1'},{id:2,name:'2'},{id:3,name:'3'},{id:4,name:'4'}], //玩家，必须是4个，隔一个为对家
+            players: [{id: 0, name: '1'}, {id: 1, name: '2'}, {id: 2, name: '3'}, {id: 3, name: '4'}], //玩家，必须是4个，隔一个为对家
             oldPlayers: null,
             scoreId: null,   //新的得分的no
             scores: [],   //得分   [{id:1,zhuang:0,score:[10,0,5,0]},...]
@@ -220,10 +226,10 @@
             },
             computeTotalScore: function () { //计算总分
                 this.totalScores = [
-                    {id:1,score:0}, // 玩家1
-                    {id:2,score:0}, // 玩家2
-                    {id:3,score:0}, // 玩家3
-                    {id:4,score:0}, // 玩家4
+                    {id: 1, score: 0}, // 玩家1
+                    {id: 2, score: 0}, // 玩家2
+                    {id: 3, score: 0}, // 玩家3
+                    {id: 4, score: 0}, // 玩家4
                 ];
                 for (let i = 0; i < this.scores.length; i++) {
                     this.totalScores[0].score += parseInt(this.scores[i].score[0]);
@@ -232,7 +238,7 @@
                     this.totalScores[3].score += parseInt(this.scores[i].score[3]);
                 }
             },
-            computeZhuang:function () {    //计算庄家
+            computeZhuang: function () {    //计算庄家
                 console.log(this.scores);
                 if (this.scores.length < 1) {
                     this.zhuang = 0;
@@ -274,7 +280,7 @@
                 if (history == null) history = [];
 
                 let hh = {
-                    time:Date.now(),
+                    time: Date.now(),
                     players: this.players,
                     score: this.scores
                 };
@@ -284,13 +290,13 @@
 
                 this.reset();
             },
-            reset(){    //重置
+            reset() {    //重置
                 this.scores = [];
-                this.totalScores= [
-                    {id:1,score:0}, // 玩家1
-                    {id:2,score:0}, // 玩家2
-                    {id:3,score:0}, // 玩家3
-                    {id:4,score:0}, // 玩家4
+                this.totalScores = [
+                    {id: 0, score: 0}, // 玩家1
+                    {id: 1, score: 0}, // 玩家2
+                    {id: 2, score: 0}, // 玩家3
+                    {id: 3, score: 0}, // 玩家4
                 ];
                 this.saveData();
             },

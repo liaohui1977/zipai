@@ -4,7 +4,7 @@
         <v-text-field v-model="players[1].name" label="2号玩家" required />
         <v-text-field v-model="players[2].name" label="3号玩家" required />
         <v-text-field v-model="players[3].name" label="4号玩家" required />
-        <v-layout class="my-4" row>
+        <v-layout row>
             <v-spacer/>
             <v-btn @click="submit" color="primary">提交</v-btn>
             <v-btn @click="clear">重置</v-btn>
